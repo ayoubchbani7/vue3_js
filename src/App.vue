@@ -1,43 +1,55 @@
 <template>
-  <div>Hello world {{ firstName }} {{ lastName }} {{ count }}</div>
-  <button @click="increment">Increment</button>
-  <button @click="decrement">Decrement</button>
-  <div v-show="count > 5">Count is greater than 0</div>
+  <div v-if="todos.length=== 0">Vous n'avez pas de tâches</div>
+  <div v-else>
+    <div v-for="todo in sortedTodos" :key="todo.date" :class="{completed : todo.completed}">
+      <label for="completed" >
+      <input type="checkbox" name="completed" id="" v-model="todo.completed" > {{ todo.title }} </input>
+    </label></div>
+  </div>
+  <form @submit.prevent="addTodo">
+    <input type="text" v-model="newTodo" placeholder="Nouvelle tâche">
+    <button type="submit" :disabled="newTodo.length === 0 ">Ajouter</button>
+  </form>
 </template>
+<script setup> 
+import { computed, ref } from 'vue';
+const todos = ref([
+  {
+  date:1,
+  completed :true,
+  title:'tache de test',
+},
+  {
+  completed:false,
+  date:2,
+  title:'tache à faire',
+}
 
-<script setup>
-import { ref } from "vue";
-const firstName = "John";
-const lastName = "Doe";
-const count = ref(0);
-console.log(count, count.value);
-const increment = (event) => {
-  count.value++;
-  console.log(event);
-};
-const decrement = () => {
-  count.value--;
-};
+]);
+const hideCompleted  = ref(false);
+const newTodo = ref('');
+const addTodo = ()=> {
+  todos.value.push({
+    date: Date.now(),
+    title: newTodo.value,
+    completed: false
+  })
+newTodo.value =''
+}
+
+const sortedTodos = computed(() => {
+  console.log(todos.value)
+    return todos.value.toSorted((a,b)=>a.completed > b.completed ? 1 : -1)
+ 
+    
+})
 </script>
 
 <style scoped>
-div {
-  color: red;
-  font-weight: bold;
-  font-size: 20px;
-  text-align: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  margin-left: 20px;
-  margin-right: 20px;
-  padding: 20px;
-  border: 1px solid red;
-  border-radius: 10px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
-  transition: all 0.3s ease;
-  &:hover {
-    background-color: blue;
-    color: white;
-  }
+
+.completed {
+  opacity: 5;
+  text-decoration: line-through;
+  color:red
 }
 </style>
